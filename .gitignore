@@ -1,0 +1,27 @@
+﻿# secrets / local config
+secrets.h
+.dev.vars
+env.json
+
+# build output
+.pio/
+.wrangler/
+node_modules/
+app/build/
+app/.dart_tool/
+app/android/.gradle/
+app/android/.kotlin/
+app/android/local.properties
+app/.flutter-plugins-dependencies
+*.apk
+
+# test audio and logs
+*.wav
+bench/data/logs/
+backend/hello-worker/test/clips/*.m4a
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.iml
+.idea/

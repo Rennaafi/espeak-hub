@@ -1,0 +1,69 @@
+Replies aborted by a WebSocket disconnect (excluded below): 5 of 600 rows; by variant/clip: V1/long: 4, V3/long: 1
+  (V0 reports no row for an aborted reply and the driver retries it; disconnects per session are in data/logs/*.out)
+Pre-registered rule (zero starvation AND zero dry): no P qualifies
+P* (amended: smallest P with zero starvation over all V1 runs) = 250
+
+V1 per P: runs with starvation / dry events / median TTFS
+  P=  0: starve runs 1/59, starve events 4, max gap 187 ms, dry 3, TTFS 30.8 ms
+  P= 50: starve runs 5/60, starve events 7, max gap 536 ms, dry 3, TTFS 31.1 ms
+  P=100: starve runs 3/58, starve events 5, max gap 145 ms, dry 2, TTFS 30.9 ms
+  P=250: starve runs 0/60, starve events 0, max gap 0 ms, dry 1, TTFS 145.3 ms
+  P=500: starve runs 1/59, starve events 8, max gap 652 ms, dry 1, TTFS 145.5 ms
+  start on frame 1 (P<=170): 9/177 runs starved (5.1 %), TTFS 30.9 ms; start on frame 2+ (P>=250): 1/119 (0.8 %), TTFS 145.5 ms; Fisher exact p = 0.054
+  P=250: 0/60 starved -> 95 % upper bound on the per-run starvation rate ~ 5.0 % (rule of three)
+  runs whose download was slower than real time (< 48 kB/s): 6 of 595; no finite prebuffer short of the whole reply prevents starvation there
+
+Dry-ring events (I2S library ring found empty) per variant: events / runs
+  V0: 0 / 60 runs (0 runs with any)
+  V1: 10 / 296 runs (9 runs with any)
+  V2: 4 / 120 runs (4 runs with any)
+  V3: 3 / 59 runs (2 runs with any)
+  V4: 2 / 60 runs (2 runs with any)
+
+TTFS, V0 vs V1@P*: medians, Mann-Whitney U (two-sided), 95% bootstrap CI of the median difference (V0 - V1)
+  short : V0    669.3 ms (n=20)  V1   142.7 ms (n=20)  diff    526.6 ms [486.7, 560.6]  U=400 p=6.8e-08
+  medium: V0   1306.8 ms (n=20)  V1   147.2 ms (n=20)  diff   1159.5 ms [1117.3, 1315.1]  U=400 p=6.8e-08
+  long  : V0   4402.9 ms (n=20)  V1   142.0 ms (n=20)  diff   4260.8 ms [4221.7, 4356.9]  U=400 p=6.8e-08
+  TTFS vs size, V0: 7.47 ms per kB, r = 0.945
+  TTFS vs size, V1@P=250: -0.01 ms per kB, r = -0.046
+  RSSI vs download time per byte (all runs): Spearman rho = -0.26, p = 1.5e-10
+
+Load during playback (first -> last sample), medians [IQR], all clips pooled; (whole reply)
+  V0: core0   6.9 % [6.9-7.1] (10.6)  core1 100.0 % [100.0-100.0] (82.0)  face max gap 61.8 ms  starves 0  dry 0  min stack free: audio 1788 face 6288 loop 3852 i2s 18444 B
+  V1: core0  11.1 % [10.5-11.4] (11.4)  core1  92.8 % [92.1-94.4] (91.4)  face max gap 63.0 ms  starves 0  dry 1  min stack free: audio 1772 face 6256 loop 3868 i2s 18452 B
+  V2: core0   9.9 % [9.3-10.2] (10.2)  core1  66.2 % [65.9-66.4] (64.3)  face max gap 69.7 ms  starves 7  dry 4  min stack free: audio 1804 face 6320 loop 3884 i2s 18452 B
+  V3: core0  10.4 % [9.9-10.9] (10.7)  core1  69.6 % [69.3-69.8] (67.8)  face max gap 70.1 ms  starves 11  dry 3  min stack free: audio 1772 face 6320 loop 3852 i2s 18452 B
+  V4: core0   9.9 % [9.4-10.4] (10.1)  core1  14.5 % [14.3-14.8] (14.6)  face max gap 70.1 ms  starves 14  dry 2  min stack free: audio 1804 face 6320 loop 3900 i2s 18444 B
+  V0 vs V1 pload0: 6.9 vs 11.1, diff -4.2 [-4.3, -3.9] p=2.4e-21
+  V0 vs V1 pload1: 100.0 vs 92.8, diff +7.2 [5.9, 7.6] p=5.6e-24
+  V0 vs V1 dl_ms: 1290.0 vs 1240.4, diff +49.6 [-177.3, 264.8] p=0.41
+  V0 vs V1 max_frame_ms: 61.8 vs 63.0, diff -1.2 [-1.6, -0.7] p=2.9e-09
+  V1 vs V2 pload0: 11.1 vs 9.9, diff +1.2 [0.9, 1.4] p=3.3e-19
+  V1 vs V2 pload1: 92.8 vs 66.2, diff +26.6 [26.2, 27.8] p=7.1e-28
+  V1 vs V2 dl_ms: 1240.4 vs 1304.7, diff -64.3 [-247.1, 182.2] p=0.18
+  V1 vs V2 max_frame_ms: 63.0 vs 69.7, diff -6.7 [-7.3, -6.4] p=9e-28
+  V2 vs V3 pload0: 9.9 vs 10.4, diff -0.5 [-0.8, -0.2] p=1.6e-06
+  V2 vs V3 pload1: 66.2 vs 69.6, diff -3.4 [-3.5, -3.2] p=3.4e-24
+  V2 vs V3 dl_ms: 1304.7 vs 1177.1, diff +127.6 [10.9, 462.8] p=0.055
+  V2 vs V3 max_frame_ms: 69.7 vs 70.1, diff -0.3 [-0.9, 0.5] p=0.15
+  V2 vs V4 pload0: 9.9 vs 9.9, diff +0.0 [-0.2, 0.3] p=0.62
+  V2 vs V4 pload1: 66.2 vs 14.5, diff +51.7 [51.5, 51.8] p=6.9e-28
+  V2 vs V4 max_frame_ms: 69.7 vs 70.1, diff -0.4 [-1.0, -0.0] p=0.00047
+
+Network drift: download throughput per session (median kB/s), runs with starvation
+  V0 20261011_191113: n= 23   135.4 kB/s  starved runs 0
+  V0 20261011_192016: n= 37   153.4 kB/s  starved runs 0
+  V1 20261011_193045: n=192   152.3 kB/s  starved runs 10
+  V1 20261011_202106: n=104   149.5 kB/s  starved runs 0
+  V2 20261011_204431: n= 60   145.5 kB/s  starved runs 0
+  V2 20261012_000243: n= 60   114.7 kB/s  starved runs 5
+  V3 20261011_205810: n= 46   156.7 kB/s  starved runs 2
+  V3 20261011_234511: n= 13    91.8 kB/s  starved runs 2
+  V4 20261011_234855: n= 60   100.2 kB/s  starved runs 5
+  starved runs download at 67.9 kB/s vs 147.8 kB/s for the rest (MWU p = 5.3e-14)
+  before the outage, V2 vs V3 starved runs: 0/60 vs 2/46, Fisher p = 0.19 (V3's starved runs downloaded at 23.8 kB/s)
+  same-network control: V2 re-run (20261012_000243, n=60) vs V4 (n=60)
+    pload1: 66.2 vs 14.5, diff +51.7 [51.6, 51.9] p=3e-21
+    dl_ms: 1742.6 vs 1983.1, diff -240.5 [-830.5, 926.9] p=0.28
+    kBps: 114.7 vs 100.2, diff +14.6 [3.4, 24.5] p=0.0089
+    starved runs: 5/60 vs 5/60, Fisher p = 1
